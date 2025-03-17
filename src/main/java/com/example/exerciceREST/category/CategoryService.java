@@ -32,6 +32,9 @@ public class CategoryService {
         return categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
-
+    //supprimer une catégorie
+    public void deleteCategory(Integer id){
+        categoryRepository.deleteById(id);
+    }
 
 }

@@ -32,4 +32,10 @@ public class ProductController {
     public ResponseEntity<Object> getProductById(@PathVariable Integer id){
         return this.productService.getProductById(id);
     }
+
+    //delete user
+    @DeleteMapping("/{id}")
+    public void deleteProduct(@PathVariable Integer id){
+        this.productService.deleteProduct(id);
+    }
 }

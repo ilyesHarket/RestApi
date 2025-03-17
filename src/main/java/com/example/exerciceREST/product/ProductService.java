@@ -41,5 +41,8 @@ public class ProductService {
         return ResponseEntity.ok(productOptional.get());
     }
 
-
+    //supprimer un produit
+    public void deleteProduct(Integer id){
+        productRepository.deleteById(id);
+    }
 }

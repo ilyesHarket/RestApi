@@ -32,4 +32,10 @@ public class CategoryController {
     public Category getCategoryById(@PathVariable Integer id){
         return this.categoryService.getCategoryById(id);
     }
+
+    //delete category
+    @DeleteMapping("/{id}")
+    public void deleteCategory(@PathVariable Integer id){
+        this.categoryService.deleteCategory(id);
+    }
 }

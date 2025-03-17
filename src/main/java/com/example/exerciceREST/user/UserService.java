@@ -56,4 +56,9 @@ public class UserService {
 
         return user;
     }
+
+    //supprimer un utilisateur
+    public void deleteUser(Integer id){
+        userRepository.deleteById(id);
+    }
 }

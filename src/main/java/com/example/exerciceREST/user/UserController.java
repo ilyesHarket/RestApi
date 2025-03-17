@@ -40,4 +40,10 @@ public class UserController {
         User updatedUser = userService.assignProduct(userId, productId);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
+
+    //delete user
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Integer id){
+        this.userService.deleteUser(id);
+    }
 }
