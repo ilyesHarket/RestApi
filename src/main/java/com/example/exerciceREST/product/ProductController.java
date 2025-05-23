@@ -27,7 +27,7 @@ public class ProductController {
         return this.productService.getProducts();
     }
 
-    //get user by id
+    //get product by id
     @GetMapping("/{id}") // ? what is this id
     public ResponseEntity<Object> getProductById(@PathVariable Integer id){
         return this.productService.getProductById(id);
