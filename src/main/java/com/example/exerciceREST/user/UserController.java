@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -45,5 +46,24 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id){
         this.userService.deleteUser(id);
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<Object> signup(@RequestParam String username, @RequestParam String password) {
+        return userService.register(username, password);
+    }
+
+    @PostMapping("/signin")
+    public ResponseEntity<Object> signin() {
+            return ResponseEntity.ok("Login successful");
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<Object> createAdmin(@RequestBody Map<String, String> payload) {
+        String username = payload.get("username");
+        String password = payload.get("password");
+        String email = payload.get("email");
+
+        return userService.createAdmin(username, password, email);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.exerciceREST.product;
 import com.example.exerciceREST.category.Category;
 import com.example.exerciceREST.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -29,10 +30,6 @@ public class Product {
         return category;
     }
 
-    public User getUser() {
-        return user;
-    }
-
     //setters
 
 
@@ -56,10 +53,6 @@ public class Product {
         this.category = category;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -69,10 +62,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name="category_id")
+    @JsonIgnore
     private Category category;
-
-    @ManyToOne
-    @JoinColumn(name="user_id")
-    private User user;
 
 }

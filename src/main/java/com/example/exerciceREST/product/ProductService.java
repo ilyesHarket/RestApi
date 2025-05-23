@@ -1,6 +1,9 @@
 package com.example.exerciceREST.product;
 
+import com.example.exerciceREST.category.Category;
+import com.example.exerciceREST.category.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -14,6 +17,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Autowired
+    private CategoryRepository categoryRepository;
 
     //constructeur
     public ProductService(ProductRepository productRepository) {
@@ -44,5 +48,12 @@ public class ProductService {
     //supprimer un produit
     public void deleteProduct(Integer id){
         productRepository.deleteById(id);
+    }
+
+    //get product by category
+    public List<Product> getProductsByCategoryId(Integer categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+        return productRepository.findByCategory(category);
     }
 }

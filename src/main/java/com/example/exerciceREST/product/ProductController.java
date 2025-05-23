@@ -38,4 +38,10 @@ public class ProductController {
     public void deleteProduct(@PathVariable Integer id){
         this.productService.deleteProduct(id);
     }
+
+    //get product by category
+    @GetMapping("/by-category/{categoryId}")
+    public List<Product> getProductsByCategory(@PathVariable Integer categoryId) {
+        return productService.getProductsByCategoryId(categoryId);
+    }
 }
