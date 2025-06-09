@@ -1,6 +1,8 @@
 package com.example.exerciceREST.category;
 
 import com.example.exerciceREST.product.Product;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.List;
 

@@ -1,12 +1,15 @@
 package com.example.exerciceREST.product;
 import com.example.exerciceREST.category.Category;
 import com.example.exerciceREST.user.User;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 @Entity
 
 @Table(name="product")
+
 public class Product {
 
     //getters
