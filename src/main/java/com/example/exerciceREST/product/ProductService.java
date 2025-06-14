@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -39,16 +40,17 @@ public class ProductService {
             }
             
             Product savedProduct = productRepository.save(product);
-            return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+            return new ResponseEntity<>(new ProductDTO(savedProduct), HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error creating product: " + e.getMessage());
         }
     }
 
     //récupérer tous les produits
-    public List<Product> getProducts(){
-        return this.productRepository.findAll();
-        //select * from product
+    public List<ProductDTO> getProducts(){
+        return this.productRepository.findAll().stream()
+            .map(ProductDTO::new)
+            .collect(Collectors.toList());
     }
 
     //récupérer un produit par son id
@@ -57,7 +59,7 @@ public class ProductService {
         if(!productOptional.isPresent()){
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(productOptional.get());
+        return ResponseEntity.ok(new ProductDTO(productOptional.get()));
     }
 
     //supprimer un produit
@@ -66,9 +68,44 @@ public class ProductService {
     }
 
     //get product by category
-    public List<Product> getProductsByCategoryId(Integer categoryId) {
+    public List<ProductDTO> getProductsByCategoryId(Integer categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
-        return productRepository.findByCategory(category);
+        return productRepository.findByCategory(category).stream()
+            .map(ProductDTO::new)
+            .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<Object> updateProduct(Integer id, Product updatedProduct) {
+        try {
+            Optional<Product> existingProductOpt = productRepository.findById(id);
+            if (!existingProductOpt.isPresent()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Product existingProduct = existingProductOpt.get();
+
+            // Update basic fields
+            existingProduct.setName(updatedProduct.getName());
+            existingProduct.setDescription(updatedProduct.getDescription());
+            existingProduct.setPrice(updatedProduct.getPrice());
+
+            // Handle category update
+            if (updatedProduct.getCategory() != null && updatedProduct.getCategory().getId() != null) {
+                Optional<Category> categoryOpt = categoryRepository.findById(updatedProduct.getCategory().getId());
+                if (categoryOpt.isPresent()) {
+                    existingProduct.setCategory(categoryOpt.get());
+                } else {
+                    return ResponseEntity.badRequest().body("Category not found with ID: " + updatedProduct.getCategory().getId());
+                }
+            } else {
+                return ResponseEntity.badRequest().body("Category ID is required");
+            }
+
+            Product savedProduct = productRepository.save(existingProduct);
+            return ResponseEntity.ok(new ProductDTO(savedProduct));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error updating product: " + e.getMessage());
+        }
     }
 }

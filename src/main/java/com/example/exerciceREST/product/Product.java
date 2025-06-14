@@ -56,6 +56,7 @@ public class Product {
         this.price = price;
     }
 
+    @JsonProperty("category")
     public Category getCategory() {
         return category;
     }

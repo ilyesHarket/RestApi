@@ -7,8 +7,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
-
-
 public class ProductController {
     private final ProductService productService;
 
@@ -23,7 +21,7 @@ public class ProductController {
     }
 
     @GetMapping("/")
-    public List<Product> getAllProducts(){
+    public List<ProductDTO> getAllProducts(){
         return this.productService.getProducts();
     }
 
@@ -31,6 +29,11 @@ public class ProductController {
     @GetMapping("/{id}") // ? what is this id
     public ResponseEntity<Object> getProductById(@PathVariable Integer id){
         return this.productService.getProductById(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateProduct(@PathVariable Integer id, @RequestBody Product product) {
+        return this.productService.updateProduct(id, product);
     }
 
     //delete user
@@ -41,7 +44,7 @@ public class ProductController {
 
     //get product by category
     @GetMapping("/by-category/{categoryId}")
-    public List<Product> getProductsByCategory(@PathVariable Integer categoryId) {
+    public List<ProductDTO> getProductsByCategory(@PathVariable Integer categoryId) {
         return productService.getProductsByCategoryId(categoryId);
     }
 }
