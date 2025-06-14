@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-
 public class ProductService {
     private final ProductRepository productRepository;
 
@@ -25,9 +24,25 @@ public class ProductService {
     }
 
     //créer un nouveau produit
-    public ResponseEntity<Object> newProduct(Product product){
-        productRepository.save(product);
-        return new ResponseEntity<>(product, HttpStatus.CREATED);
+    public ResponseEntity<Object> newProduct(Product product) {
+        try {
+            // If category is provided with an ID, fetch the actual category entity
+            if (product.getCategory() != null && product.getCategory().getId() != null) {
+                Optional<Category> categoryOpt = categoryRepository.findById(product.getCategory().getId());
+                if (categoryOpt.isPresent()) {
+                    product.setCategory(categoryOpt.get());
+                } else {
+                    return ResponseEntity.badRequest().body("Category not found with ID: " + product.getCategory().getId());
+                }
+            } else {
+                return ResponseEntity.badRequest().body("Category ID is required");
+            }
+            
+            Product savedProduct = productRepository.save(product);
+            return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error creating product: " + e.getMessage());
+        }
     }
 
     //récupérer tous les produits
