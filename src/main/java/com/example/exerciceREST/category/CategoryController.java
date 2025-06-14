@@ -33,9 +33,24 @@ public class CategoryController {
         return this.categoryService.getCategoryById(id);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateCategory(@PathVariable Integer id, @RequestBody Category category) {
+        try {
+            Category updatedCategory = this.categoryService.updateCategory(id, category);
+            return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
     //delete category
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable Integer id){
-        this.categoryService.deleteCategory(id);
+    public ResponseEntity<Object> deleteCategory(@PathVariable Integer id) {
+        try {
+            this.categoryService.deleteCategory(id);
+            return new ResponseEntity<>("Category deleted successfully", HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 }

@@ -32,8 +32,19 @@ public class CategoryService {
         return categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
+    public Category updateCategory(Integer id, Category updatedCategory) {
+        Category existingCategory = categoryRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Category not found with ID: " + id));
+        
+        existingCategory.setName(updatedCategory.getName());
+        return categoryRepository.save(existingCategory);
+    }
+
     //supprimer une catégorie
-    public void deleteCategory(Integer id){
+    public void deleteCategory(Integer id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new RuntimeException("Category not found with ID: " + id);
+        }
         categoryRepository.deleteById(id);
     }
 

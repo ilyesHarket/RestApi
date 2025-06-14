@@ -2,14 +2,25 @@ package com.example.exerciceREST.category;
 
 import com.example.exerciceREST.product.Product;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name="category")
-
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Category {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    private String name;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Product> products;
 
     public Integer getId() {
         return id;
@@ -19,6 +30,7 @@ public class Category {
         return name;
     }
 
+    @JsonIgnore
     public List<Product> getProducts() {
         return products;
     }
@@ -34,13 +46,5 @@ public class Category {
     public void setProducts(List<Product> products) {
         this.products = products;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-    private String name;
-
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
 }
 
