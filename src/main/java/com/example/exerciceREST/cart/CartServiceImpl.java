@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.exerciceREST.product.ProductRepository;
 import java.util.List;
+import java.util.Comparator;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -16,33 +17,48 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void addToCart(CartItem item) {
+        // Verify product exists in database
         if (!productRepository.existsById(item.getProductId())) {
             throw new RuntimeException("Produit non trouvé");
         }
-        // Optionnel : met à jour le nom et le prix depuis la base
+
+        // Get product details
         productRepository.findById(item.getProductId()).ifPresent(product -> {
             item.setProductName(product.getName());
             item.setPrice(product.getPrice());
         });
-        cartItemRepository.save(item);
+
+        // Check if product already exists in cart
+        List<CartItem> existingItems = cartItemRepository.findByProductId(item.getProductId());
+        if (!existingItems.isEmpty()) {
+            // Update quantity of existing item
+            CartItem existingItem = existingItems.get(0);
+            existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
+            cartItemRepository.save(existingItem);
+        } else {
+            // Add new item to cart
+            cartItemRepository.save(item);
+        }
     }
 
     @Override
     public List<CartItem> getCart() {
-        return cartItemRepository.findAll();
+        List<CartItem> items = cartItemRepository.findAll();
+        items.sort(Comparator.comparing(CartItem::getProductName));
+        return items;
     }
 
     @Override
     public void updateCartItem(CartItem item) {
-        if (!productRepository.existsById(item.getProductId())) {
-            throw new RuntimeException("Produit non trouvé");
+        // Find the existing cart item
+        List<CartItem> existingItems = cartItemRepository.findByProductId(item.getProductId());
+        if (existingItems.isEmpty()) {
+            throw new RuntimeException("Item not found in cart");
         }
-        List<CartItem> items = cartItemRepository.findByProductId(item.getProductId());
-        if (!items.isEmpty()) {
-            CartItem existingItem = items.get(0);
-            existingItem.setQuantity(item.getQuantity());
-            cartItemRepository.save(existingItem);
-        }
+
+        CartItem existingItem = existingItems.get(0);
+        existingItem.setQuantity(item.getQuantity());
+        cartItemRepository.save(existingItem);
     }
 
     @Override
