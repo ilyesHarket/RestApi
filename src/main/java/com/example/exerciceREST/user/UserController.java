@@ -54,8 +54,8 @@ public class UserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<Object> login(@RequestParam String Username, @RequestParam String Password) {
-        return userService.login(Username, Password);
+    public ResponseEntity<Object> login(@RequestBody LoginRequest credentials) {
+        return userService.login(credentials.getUsername(), credentials.getPassword());
     }
 
     @PostMapping("/admin")

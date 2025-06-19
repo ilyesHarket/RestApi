@@ -15,15 +15,19 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
+    private final JwtRequestFilter jwtRequestFilter;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtRequestFilter jwtRequestFilter) {
         this.userDetailsService = userDetailsService;
+        this.jwtRequestFilter = jwtRequestFilter;
     }
 
     @Bean
@@ -41,6 +45,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // Public GET endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
@@ -58,8 +63,8 @@ public class SecurityConfig {
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(form -> form.disable());
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -69,6 +74,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization")); // Allow Authorization header in response
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

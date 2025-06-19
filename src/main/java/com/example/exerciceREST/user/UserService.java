@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 
@@ -18,14 +20,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     //autowired for dependency injection
     @Autowired
     //constructeur ?
-    public UserService(UserRepository userRepository, ProductRepository productRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, ProductRepository productRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     //créer un nouvel utilisateur
@@ -94,7 +98,16 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
 
-        return ResponseEntity.ok("Login successful");
+        final String token = jwtUtil.generateToken(user);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("username", user.getUsername());
+        response.put("role", user.getRole());
+        response.put("email", user.getEmail());
+        response.put("name", user.getName());
+
+        return ResponseEntity.ok(response);
     }
 
     //create admin user
