@@ -23,6 +23,7 @@ public class DataSeeder {
             // System.out.println("Clearing existing data...");
             // productRepository.deleteAll();
             // categoryRepository.deleteAll();
+            // userRepository.deleteAll();
             // System.out.println("Database cleared!");
 
             // Check if data already exists

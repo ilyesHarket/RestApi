@@ -49,8 +49,8 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> signup(@RequestParam String username, @RequestParam String password) {
-        return userService.register(username, password);
+    public ResponseEntity<Object> signup(@RequestBody User user) {
+        return userService.register(user);
     }
 
     @PostMapping("/signin")

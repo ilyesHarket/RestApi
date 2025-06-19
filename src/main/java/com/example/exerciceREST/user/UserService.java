@@ -71,19 +71,29 @@ public class UserService {
     }
 
     //register un nouvel utilisateur
-    public ResponseEntity<Object> register(String username, String password) {
-        Optional<User> existingUser = userRepository.findByUsername(username);
+    public ResponseEntity<Object> register(User user) {
+        Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
         if (existingUser.isPresent()) {
             return ResponseEntity.badRequest().body("Username already exists");
         }
 
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(passwordEncoder.encode(password));
+        // Hash the password and set role
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole("USER");
 
         userRepository.save(user);
-        return ResponseEntity.status(201).body("User registered successfully");
+
+        // Generate token and return user info (same as login)
+        final String token = jwtUtil.generateToken(user);
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("username", user.getUsername());
+        response.put("role", user.getRole());
+        response.put("email", user.getEmail());
+        response.put("name", user.getName());
+        response.put("userId", user.getId());
+
+        return ResponseEntity.status(201).body(response);
     }
 
     //login un utilisateur
