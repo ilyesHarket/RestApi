@@ -74,7 +74,15 @@ public class UserService {
     public ResponseEntity<Object> register(User user) {
         Optional<User> existingUser = userRepository.findByUsername(user.getUsername());
         if (existingUser.isPresent()) {
-            return ResponseEntity.badRequest().body("Username already exists");
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Username already exists");
+            return ResponseEntity.badRequest().body(error);
+        }
+        // Check for duplicate email
+        if (user.getEmail() != null && userRepository.findAll().stream().anyMatch(u -> user.getEmail().equals(u.getEmail()))) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Email already exists");
+            return ResponseEntity.badRequest().body(error);
         }
 
         // Hash the password and set role
