@@ -100,7 +100,20 @@ public class DataSeeder {
                 System.out.println("Normal user created: username=user, password=user");
             }
 
+            // Create another normal user
+            if (userRepository.findByUsername("user2").isEmpty()) {
+                PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                User normalUser = new User();
+                normalUser.setUsername("user2");
+                normalUser.setPassword(passwordEncoder.encode("user"));
+                normalUser.setRole("USER");
+                normalUser.setEmail("user2@user.com");
+                normalUser.setName("Another Normal User");
+                userRepository.save(normalUser);
+                System.out.println("Normal user created: username=user2, password=user");
+            }
+
             System.out.println("Database seeding completed!");
         };
     }
-} 
+}

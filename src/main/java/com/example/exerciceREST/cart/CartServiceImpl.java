@@ -16,7 +16,7 @@ public class CartServiceImpl implements CartService {
     private ProductRepository productRepository;
 
     @Override
-    public void addToCart(CartItem item) {
+    public void addToCart(CartItem item, Integer userId) {
         // Verify product exists in database
         if (!productRepository.existsById(item.getProductId())) {
             throw new RuntimeException("Produit non trouvé");
@@ -28,8 +28,11 @@ public class CartServiceImpl implements CartService {
             item.setPrice(product.getPrice());
         });
 
-        // Check if product already exists in cart
-        List<CartItem> existingItems = cartItemRepository.findByProductId(item.getProductId());
+        // Set userId
+        item.setUserId(userId);
+        // Check if product already exists in user's cart
+        List<CartItem> existingItems = cartItemRepository.findByUserId(userId).stream()
+            .filter(ci -> ci.getProductId().equals(item.getProductId())).toList();
         if (!existingItems.isEmpty()) {
             // Update quantity of existing item
             CartItem existingItem = existingItems.get(0);
@@ -42,35 +45,36 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartItem> getCart() {
-        List<CartItem> items = cartItemRepository.findAll();
+    public List<CartItem> getCart(Integer userId) {
+        List<CartItem> items = cartItemRepository.findByUserId(userId);
         items.sort(Comparator.comparing(CartItem::getProductName));
         return items;
     }
 
     @Override
-    public void updateCartItem(CartItem item) {
-        // Find the existing cart item
-        List<CartItem> existingItems = cartItemRepository.findByProductId(item.getProductId());
+    public void updateCartItem(CartItem item, Integer userId) {
+        // Find the existing cart item for this user
+        List<CartItem> existingItems = cartItemRepository.findByUserId(userId).stream()
+            .filter(ci -> ci.getProductId().equals(item.getProductId())).toList();
         if (existingItems.isEmpty()) {
             throw new RuntimeException("Item not found in cart");
         }
-
         CartItem existingItem = existingItems.get(0);
         existingItem.setQuantity(item.getQuantity());
         cartItemRepository.save(existingItem);
     }
 
     @Override
-    public void removeFromCart(Integer productId) {
-        List<CartItem> items = cartItemRepository.findByProductId(productId);
+    public void removeFromCart(Integer productId, Integer userId) {
+        List<CartItem> items = cartItemRepository.findByUserId(userId).stream()
+            .filter(ci -> ci.getProductId().equals(productId)).toList();
         if (!items.isEmpty()) {
             cartItemRepository.delete(items.get(0));
         }
     }
 
-    public double getCartTotal() {
-        List<CartItem> items = cartItemRepository.findAll();
+    public double getCartTotal(Integer userId) {
+        List<CartItem> items = cartItemRepository.findByUserId(userId);
         return items.stream()
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())
                 .sum();

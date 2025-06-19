@@ -7,11 +7,12 @@ import jakarta.persistence.*;
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // ou Integer si tu veux, mais l’id du panier peut rester Long
+    private Long id; // ou Integer si tu veux, mais l'id du panier peut rester Long
     private Integer productId; // <-- Ici, Integer pour matcher Product
     private String productName;
     private double price;
     private int quantity;
+    private Integer userId;
 
     // Constructeurs, getters et setters
     public CartItem() {}
@@ -31,4 +32,6 @@ public class CartItem {
     public void setPrice(double price) { this.price = price; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
 }
